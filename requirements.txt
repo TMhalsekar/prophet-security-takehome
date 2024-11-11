@@ -5,3 +5,6 @@ databases
 pydantic
 sqlalchemy
 psycopg2-binary
+pytest
+httpx
+pytest-asyncio
