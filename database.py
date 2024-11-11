@@ -3,22 +3,24 @@ from databases import Database
 
 import os
 
-# Database URL for PostgreSQL
-#DATABASE_URL = "postgresql://postgres:postgres@localhost/suspicious_events"
+# Check environment
+PATH = "/.dockerenv"
 
-DATABASE_URL_STRING = os.getenv("DATABASE_URL")
+if os.path.exists(PATH):
+    DATABASE_URL = os.getenv("DATABASE_URL")    #if running inside docker
+else:
+    DATABASE_URL = "postgresql://postgres:postgres@localhost/suspicious_events"   #running locally
 
-if not DATABASE_URL_STRING:
+if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is not set")
 
 # Create SQLAlchemy engine for synchronous operations
-engine = create_engine(DATABASE_URL_STRING)
+engine = create_engine(DATABASE_URL)
 
 # Create metadata instance to hold table definitions
 metadata = MetaData()
 
 # Set up an async database connection for FastAPI
-DATABASE_URL = DATABASE_URL_STRING
 database = Database(DATABASE_URL)
 
 
