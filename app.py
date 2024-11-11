@@ -16,11 +16,10 @@ import ipaddress
 import logging
 
 
-
 # Ensure tables are created in the database
 metadata.create_all(engine)
 
-app = FastAPI(on_startup=[connect_db], on_shutdown=[disconnect_db])
+app = FastAPI(title="ProphetSecurity", on_startup=[connect_db], on_shutdown=[disconnect_db])
 
 logger = logging.getLogger("FastAPI TestLogger")
 
@@ -74,7 +73,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 # Routes for CRUD operations on Suspicious IP Ranges
-@app.post("/ip-ranges", response_model=dict, status_code=status.HTTP_201_CREATED)
+@app.post("/ip-ranges", response_model=dict, status_code=status.HTTP_201_CREATED, tags=["IPs"])
 async def add_ip_range(ip_range: IPRange):
     """Add a new IP range in CIDR notation.
     Checks for correct format and uniqueness before adding to the database.
@@ -91,14 +90,14 @@ async def add_ip_range(ip_range: IPRange):
         raise HTTPException(status_code=422, detail="This IP range already exists.")
 
 
-@app.get("/ip-ranges", response_model=List[IPRange])
+@app.get("/ip-ranges", response_model=List[IPRange], tags=["IPs"])
 async def get_ip_ranges():
     """Retrieve all IP ranges"""
     rows = await crud.get_ip_ranges()
     return [IPRange(cidr=str(ipaddress.ip_network(row["cidr"]))) for row in rows]
 
 
-@app.delete("/ip-ranges", response_model=dict)
+@app.delete("/ip-ranges", response_model=dict, tags=["IPs"])
 async def delete_ip_range(
     cidr: str = Query(..., description="CIDR range to delete, e.g., 173.99.253.0/24")
 ):
@@ -116,7 +115,7 @@ async def delete_ip_range(
 
 
 # Event Processing Endpoint
-@app.post("/process-event", response_model=List[EventResponse])
+@app.post("/process-event", response_model=List[EventResponse], tags=["Events"])
 async def process_event_endpoint(events: List[Event]):
     """Process a list of events, marking them as suspicious if applicable.
     Returns a list event's username,ip with their suspicious status.
@@ -133,7 +132,7 @@ async def process_event_endpoint(events: List[Event]):
 
 
 # Get Suspicious Events
-@app.get("/suspicious-events", response_model=List[Event])
+@app.get("/suspicious-events", response_model=List[Event], tags=["Events"])
 async def get_suspicious_events(
     limit: int = Query(100, ge=1, le=10000),
     offset: int = Query(0, ge=0),
