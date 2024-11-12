@@ -42,4 +42,4 @@
     docker-compose up --build
     ```
 
-3. **Access the application** at [http://localhost:8000](http://localhost:8000) and view the documentation at [http://localhost:8000/docs](http://localhost:8000/docs).
+3. **Access the application** at [http://localhost:8000](http://localhost:8000) and view the documentation and test the application at [http://localhost:8000/docs](http://localhost:8000/docs).
